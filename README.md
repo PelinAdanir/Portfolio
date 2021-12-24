@@ -14,8 +14,12 @@ The [dataset](/Data/claims.zip) includes insurance claims severities from Allsta
 
 This study looks at a [Wine Data](/Data/winequality-red.csv) dataset that includes some features about the quality and characteristics of a variety of wines. The outcome variable is the quality of wines. This model aims to use a classification tree to find the most relevant set of features that can predict the wine quality the best.
 
-### [Wine Data Study]()
+### [Wine Data Study - Random Forest and Gradient Boosting](/R_Files/Wine_Data-random forest-gradient boosting.R)
 
-### [Wine Data Study]()
+Expanding on the classification tree from the previous study, this study makes a random forest model and then a gradient boosting model.
 
-### [Wine Data Study]()
+### [Wine Data Study - Neural Net with single layer, multiple nodes]()
+
+### [Wine Data Study - Deep Learning]()
+
+### [Wine Data Study - Clustering]()
