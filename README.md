@@ -29,3 +29,6 @@ Expanding on the classification tree from the previous study, this study makes a
 Please take a look at my Tableau Public profile for the visuals I've made in some projects.
 
 Profile: https://public.tableau.com/app/profile/pelin.adanir
+
+# Optimization Projects
+
