@@ -30,3 +30,7 @@ Profile: https://public.tableau.com/app/profile/pelin.adanir
 
 # Optimization Projects
 
+Application Project:
+
+This project aims to minimize the risk of a generated portfolio based on a list of stocks, by changing the weights on these stocks. Individuals can generate a custom portfolio that finds the lowest risk by using a list of stocks of their choosing. In the example code, I have used the QQQ index stocks [here](/Data/QQQ_portfolio.xlsx). The results of the code shows the total annual return of the portfolio as well as the weights on the stocks that make up the portfolio. 
+
