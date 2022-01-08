@@ -18,7 +18,9 @@ This study looks at a [Wine Data](/Data/winequality-red.csv) dataset that includ
 
 Expanding on the classification tree from the previous study, this study makes a random forest model and then a gradient boosting model. Later on, using neural networks I compared a single layered model and a model with hidden layers.
 
-### [Wine Data Study - Clustering]()
+### [Wine Data Study - Clustering](/R_Files/Wine_Data-clustering.R)
+
+Using the same Wine qualities dataset, running a clustering analysis to find out about any clusters in the set that might be useful for explaining data. 
 
 # Data Visualization
 
