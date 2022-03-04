@@ -1,3 +1,17 @@
+# Data Visualization
+
+Please take a look at my Tableau Public profile for the visuals I've made in some projects.
+
+Profile: https://public.tableau.com/app/profile/pelin.adanir
+
+# SQL Portfolio
+
+### [CFPB Complaints Data Analysis](/SQL_queries/cfpb_analysis.txt) 
+This analysis uses a public dataset called 'cfpb complaints' that is available on Google BigQuery.
+
+### [NOAA Historic Storms Data Analysis](/SQL_queries/noaa_storms_analysis.txt)
+This analysis uses a puclib dataset called 'noaa historic storms' that is available on Google BigQuery.
+
 # Machine Learning Models
 ### [Telecom Work Measurement Study - OLS](/R_Files/Telecom_Work_Measurement_Study.R)
 This model looks at some [telecom data](/Data/tel.csv) and evaluates different linear regression models that determines the relationship between the dependent variable of number of hours worked, and some independent variables. 
@@ -21,12 +35,6 @@ Expanding on the classification tree from the previous study, this study makes a
 ### [Wine Data Study - Clustering](/R_Files/Wine_Data-clustering.R)
 
 Using the same Wine qualities dataset, running a clustering analysis to find out about any clusters in the set that might be useful for explaining data. 
-
-# Data Visualization
-
-Please take a look at my Tableau Public profile for the visuals I've made in some projects.
-
-Profile: https://public.tableau.com/app/profile/pelin.adanir
 
 # Optimization Projects
 
