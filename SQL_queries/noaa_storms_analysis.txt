@@ -1,0 +1,178 @@
+SELECT
+    COUNT(event_id),
+    COUNT( DISTINCT event_id)
+FROM
+  `bigquery-public-data.noaa_historic_severe_storms.storms_2021`;
+
+SELECT
+    COUNT(episode_id),
+    COUNT(DISTINCT episode_id)
+FROM
+  `bigquery-public-data.noaa_historic_severe_storms.storms_2021`;
+
+/*Most destructive storm in 2021*/
+SELECT episode_id, SUM(damage_property)
+FROM `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+GROUP BY episode_id
+ORDER BY SUM(damage_property) DESC
+LIMIT 1;
+
+/*Most destructive storm information - episode 162128*/
+SELECT 
+    episode_id,
+    state,
+    event_type
+FROM `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE episode_id = '162128';
+
+SELECT
+    episode_id,
+    SUM(injuries_direct) AS inj_direct,
+    SUM(injuries_indirect) AS inj_indirect,
+    SUM(deaths_direct) AS deaths_direct,
+    SUM(deaths_indirect) AS deaths_indirect,
+    SUM(damage_property) AS property_damage,
+    SUM(damage_crops) AS crop_damage
+FROM `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE episode_id = '162128'
+GROUP BY episode_id;
+
+/*Type of event causing least injuries*/
+SELECT 
+    LOWER(event_type) AS type_of_event,
+    (SUM(injuries_indirect) + SUM(injuries_direct)) AS injury_total
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_*`
+WHERE event_type IS NOT NULL 
+    AND injuries_indirect IS NOT NULL 
+    AND injuries_direct IS NOT NULL
+GROUP BY event_type
+ORDER BY injury_total
+LIMIT 10;
+
+/* Top 10 most destructive storms since 2000 */
+SELECT 
+    episode_id,
+    MIN(EXTRACT(YEAR FROM event_begin_time)) AS storm_year_start,
+    STRING_AGG( DISTINCT event_type) AS storm_event_type,
+    STRING_AGG(DISTINCT state) AS states_affected,
+    ROUND(SUM(damage_property)/1000000000,2) AS damage_in_billions
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_*`
+WHERE _TABLE_SUFFIX BETWEEN '2000' AND '2021'
+GROUP BY episode_id
+ORDER BY damage_in_billions DESC
+LIMIT 10;
+
+/* Window functions */
+/* Total state damages */
+SELECT
+    state,
+    event_id,
+    event_type,
+    damage_property,
+    SUM(damage_property) OVER(
+        PARTITION BY state        
+    ) state_damage_total
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE damage_property >0 ; 
+
+/* Showing all rows and cumulative damages by state */
+SELECT
+    state,
+    event_id,
+    event_type,
+    damage_property,
+    SUM(damage_property) OVER(
+        PARTITION BY state
+        ORDER BY event_id --assuming event id is ordered by date
+        ROWS UNBOUNDED PRECEDING
+    ) state_damage_cumulative
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE damage_property >0 ;
+
+/* All rows and cumul. damages by storm */
+SELECT
+    episode_id,
+    event_id,
+    damage_property,
+    SUM(damage_property) OVER(
+        PARTITION BY episode_id
+        ORDER BY event_id 
+        ROWS UNBOUNDED PRECEDING
+    ) storm_damage_cumulative
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE damage_property >0 ;
+
+/* Average property damage for the last 3 events */
+SELECT
+    episode_id,
+    event_id,
+    damage_property,
+    SUM(damage_property) OVER(
+        PARTITION BY episode_id
+        ORDER BY event_id 
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) storm_damage_cumulative
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+WHERE damage_property >0 ;
+
+
+/* Result Cache - FOR 24 HOURS */
+SELECT 
+    episode_id,
+    event_id
+FROM
+    `bigquery-public-data.noaa_historic_severe_storms.storms_20*`;
+
+/* Time Travel - FOR 7 DAYS*/
+SELECT
+    event_id,
+    event_type
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_2021`
+    FOR SYSTEM_TIME AS OF TIMESTAMP_SUB(CURRENT_TIMESTAMP, INTERVAL 1 HOUR);
+
+SELECT CURRENT_TIMESTAMP();
+
+/* Window Functions */
+SELECT
+    cz_name AS county,
+    state,
+    episode_id AS storm_id,
+    event_type AS individual_storm_event,
+    DENSE_RANK() OVER(
+        PARTITION BY cz_name, state
+        ORDER BY episode_id 
+    ) storm_sequence
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_20*`
+WHERE _TABLE_SUFFIX BETWEEN '16' AND '21' 
+AND cz_type = 'C'
+ORDER BY county, storm_sequence;    
+
+
+SELECT 
+    year,
+    damage_current_millions,
+    LAG(damage_current_millions) OVER (
+        ORDER BY year
+    ) AS damage_previous_millions
+FROM 
+(SELECT
+    _TABLE_SUFFIX AS year,
+    ROUND(SUM(damage_property)/1000000,2) AS damage_current_millions
+FROM 
+    `bigquery-public-data.noaa_historic_severe_storms.storms_*`
+WHERE _TABLE_SUFFIX BETWEEN '2000' AND '2021' 
+AND state = 'Hawaii'
+GROUP BY year)
+ORDER BY year;
+
+
+
+

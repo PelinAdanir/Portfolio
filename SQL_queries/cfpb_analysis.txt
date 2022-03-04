@@ -1,0 +1,58 @@
+/* Finding the date cfpb started collecting complaints */
+SELECT min(date_received) AS earliest_complaint_date
+FROM `bigquery-public-data.cfpb_complaints.complaint_database`;
+
+/* Percent increase in complaints each year */
+WITH current_totals AS(
+    SELECT 
+        EXTRACT(YEAR from date_received) AS year,
+        COUNT(complaint_id) AS total_complaints
+    FROM `bigquery-public-data.cfpb_complaints.complaint_database`
+    GROUP BY year
+    ORDER BY year
+),
+totals AS(
+    SELECT 
+        year,
+        total_complaints,
+        LAG(total_complaints) OVER (ORDER BY year) AS previous_year_total,
+    FROM current_totals
+    ORDER BY year
+)
+SELECT 
+    year,
+    total_complaints,
+    previous_year_total,
+    ROUND((total_complaints-previous_year_total)/previous_year_total,2) AS percent_increase
+FROM totals;
+
+/* Top 5 Financial product complaint categories */
+SELECT 
+    product,
+    COUNT(complaint_id) AS complaint_count
+FROM `bigquery-public-data.cfpb_complaints.complaint_database`
+GROUP BY product
+ORDER BY complaint_count DESC
+LIMIT 5;
+
+
+/* How long do complaints stay open */
+SELECT 
+    complaint_id,
+    DATE_DIFF(CURRENT_DATE(),date_received, DAY) AS days_open
+FROM `bigquery-public-data.cfpb_complaints.complaint_database`
+WHERE 
+    company_response_to_consumer = 'In progress'
+ORDER BY days_open DESC;
+
+
+/* Companies poor in timely responses */
+SELECT 
+    company_name,
+    COUNT(complaint_id) AS not_timely_responses
+FROM `bigquery-public-data.cfpb_complaints.complaint_database`
+WHERE 
+    timely_response = False
+GROUP BY company_name
+ORDER BY not_timely_responses DESC;
+
